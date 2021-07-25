@@ -29,25 +29,8 @@ function Get-DnsRecordFromCsv
                    Position=0)]
         $inFilePath
     )
-
-    function Get-QueriesFromCsv {
-        Param
-        (
-            # Host domain for sending queries to
-            [string]
-            [Parameter(Mandatory=$true,
-                       ValueFromPipelineByPropertyName=$true,
-                       Position=0)]
-            $domain,
-
-            # Input file CSV containing queries to send
-            [string]
-            [Parameter(Mandatory=$true,
-                       ValueFromPipelineByPropertyName=$true,
-                       Position=0)]
-            $inFilePath
-        )
-        
+    Process
+    {
         $infile = Import-Csv $inFilePath
         $infile | 
         ForEach-Object {
@@ -55,12 +38,18 @@ function Get-DnsRecordFromCsv
             if ($_.{Sub Domain} -eq "@" -or $_.{Sub Domain} -eq ""){
                 $querySubDomain = ""
             }
-            $_ = $_ | Add-Member -NotePropertyMembers @{querySubDomain= $querySubDomain+"."}
+            else {
+                $querySubDomain= $querySubDomain + "."
+            }
+            $_ = $_ | Add-Member -NotePropertyMembers @{domain = $querySubDomain+$domain}
         }
-    }
+        Write-Output "Queries are" $infile
 
-    Process
-    {
-        Get-QueriesFromCsv -domain $domain -inFilePath $inFilePath
+        $infile | 
+        ForEach-Object {
+            $ip = Resolve-DnsName $_.domain $_.{Record Type}
+            #$_ = $_ | Add-Member -NotePropertyMembers @{
+            $ip | gm
+        }
     }
 }
