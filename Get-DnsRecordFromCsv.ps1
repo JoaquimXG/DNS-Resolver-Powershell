@@ -27,7 +27,7 @@ function Get-DnsRecordFromCsv
         [Parameter(Mandatory=$true,
                    ValueFromPipelineByPropertyName=$true,
                    Position=0)]
-        $infile
+        $inFilePath
     )
 
     function Get-QueriesFromCsv {
@@ -45,13 +45,22 @@ function Get-DnsRecordFromCsv
             [Parameter(Mandatory=$true,
                        ValueFromPipelineByPropertyName=$true,
                        Position=0)]
-            $infile
+            $inFilePath
         )
-        Import-C
+        
+        $infile = Import-Csv $inFilePath
+        $infile | 
+        ForEach-Object {
+            $querySubDomain = $_.{Sub Domain}
+            if ($_.{Sub Domain} -eq "@" -or $_.{Sub Domain} -eq ""){
+                $querySubDomain = ""
+            }
+            $_ = $_ | Add-Member -NotePropertyMembers @{querySubDomain= $querySubDomain+"."}
+        }
     }
 
     Process
     {
-        
+        Get-QueriesFromCsv -domain $domain -inFilePath $inFilePath
     }
 }
