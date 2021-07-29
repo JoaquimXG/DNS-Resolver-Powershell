@@ -1,0 +1,4 @@
+"Address","IPAddress","QueryType","IP4Address","Name","Type","CharacterSet","Section","DataLength","TTL"
+"18.130.131.153","18.130.131.153","A","18.130.131.153","joaquimgomez.com","A","Unicode","Answer","4","46"
+,,"MX",,"joaquimgomez.com","MX","Unicode","Answer","16","46"
+"18.130.131.153","18.130.131.153","A","18.130.131.153","www.joaquimgomez.com","A","Unicode","Answer","4","45"

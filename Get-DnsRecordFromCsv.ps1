@@ -39,17 +39,24 @@ function Get-DnsRecordFromCsv
                 $querySubDomain = ""
             }
             else {
-                $querySubDomain= $querySubDomain + "."
+                $querySubDomain = $querySubDomain + "."
             }
-            $_ = $_ | Add-Member -NotePropertyMembers @{domain = $querySubDomain+$domain}
+            $_ | Add-Member -NotePropertyMembers @{domain = $querySubDomain+$domain}
         }
         Write-Output "Queries are" $infile
+        
+        $outRecords = @()
 
         $infile | 
         ForEach-Object {
-            $ip = Resolve-DnsName $_.domain $_.{Record Type}
-            #$_ = $_ | Add-Member -NotePropertyMembers @{
-            $ip | gm
+            $recordResult = Resolve-DnsName $_.domain $_.{Record Type}
+            $recordResult = $recordResult | Where-Object Type -eq $_.{Record Type}
+            #$query = $_
+            $recordResult | 
+            ForEach-Object {
+                $outRecords += $_
+            }
         }
+        $outRecords | Export-Csv -Path out.csv -NoTypeInformation
     }
 }
